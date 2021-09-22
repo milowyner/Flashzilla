@@ -36,16 +36,11 @@ struct ContentView: View {
         var events = [CHHapticEvent]()
         
         // create several taps of increasing then decreasing intensity and sharpness
-        for i in stride(from: 0, to: 1, by: 0.1) {
-            let intensity = CHHapticEventParameter(parameterID: .hapticIntensity, value: Float(i))
-            let sharpness = CHHapticEventParameter(parameterID: .hapticSharpness, value: Float(i))
-            let event = CHHapticEvent(eventType: .hapticTransient, parameters: [intensity, sharpness], relativeTime: i)
-            events.append(event)
-        }
-        for i in stride(from: 0, to: 1, by: 0.1) {
-            let intensity = CHHapticEventParameter(parameterID: .hapticIntensity, value: Float(1 - i))
-            let sharpness = CHHapticEventParameter(parameterID: .hapticSharpness, value: Float(1 - i))
-            let event = CHHapticEvent(eventType: .hapticTransient, parameters: [intensity, sharpness], relativeTime: 1 + i)
+        for i in stride(from: 0, to: 1, by: 0.05) {
+            let value = Float(-abs(2 * i - 1) + 1)
+            let intensity = CHHapticEventParameter(parameterID: .hapticIntensity, value: value)
+            let sharpness = CHHapticEventParameter(parameterID: .hapticSharpness, value: value)
+            let event = CHHapticEvent(eventType: .hapticTransient, parameters: [intensity, sharpness], relativeTime: i * 2)
             events.append(event)
         }
 
