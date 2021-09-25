@@ -11,6 +11,10 @@ struct ContentView: View {
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     @State private var cards = [Card](repeating: Card.example, count: 10)
     
+    @State private var isActive = true
+    @State private var timeRemaining = 100
+    let timer = Timer.TimerPublisher(interval: 1, runLoop: .main, mode: .common).autoconnect()
+    
     var body: some View {
         ZStack {
             Image("background")
@@ -18,11 +22,26 @@ struct ContentView: View {
                 .scaledToFill()
                 .edgesIgnoringSafeArea(.all)
             
-            ForEach(0..<cards.count, id: \.self) { index in
-                CardView(card: cards[index]) {
-                    removeCard(at: index)
+            VStack(spacing: 16) {
+                Text("Time: \(timeRemaining)")
+                    .font(.largeTitle)
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 5)
+                    .background(
+                        Capsule()
+                            .fill(Color.black)
+                            .opacity(0.75)
+                    )
+                
+                ZStack {
+                    ForEach(0..<cards.count, id: \.self) { index in
+                        CardView(card: cards[index]) {
+                            removeCard(at: index)
+                        }
+                        .stacked(at: index, in: cards.count)
+                    }
                 }
-                .stacked(at: index, in: cards.count)
             }
             
             if differentiateWithoutColor {
@@ -46,6 +65,18 @@ struct ContentView: View {
                 }
             }
         }
+        .onReceive(timer) { time in
+            guard isActive else { return }
+            if timeRemaining > 0 {
+                timeRemaining -= 1
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
+            isActive = false
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+            isActive = true
+        }
     }
     
     func removeCard(at index: Int) {
@@ -62,6 +93,11 @@ extension View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        if #available(iOS 15.0, *) {
+            ContentView()
+                .previewInterfaceOrientation(.landscapeLeft)
+        } else {
+            ContentView()
+        }
     }
 }
