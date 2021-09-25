@@ -6,33 +6,11 @@
 //
 
 import SwiftUI
-import CoreHaptics
 
 struct ContentView: View {
-    @Environment(\.accessibilityReduceMotion) var reduceMotion
-    @Environment(\.accessibilityReduceTransparency) var reduceTransparency
-    @State private var scale: CGFloat = 1
-    
     var body: some View {
-        Text("Hello, World!")
+        Text("Hello, world!")
             .padding()
-            .background(reduceTransparency ? Color.black : Color.black.opacity(0.5))
-            .foregroundColor(Color.white)
-            .clipShape(Capsule())
-            .scaleEffect(scale)
-            .onTapGesture {
-                withOptionalAnimation {
-                    scale *= 1.5
-                }
-            }
-    }
-    
-    func withOptionalAnimation<Result>(_ animation: Animation? = .default, _ body: () throws -> Result) rethrows -> Result {
-        if UIAccessibility.isReduceMotionEnabled {
-            return try body()
-        } else {
-            return try withAnimation(animation, body)
-        }
     }
 }
 
