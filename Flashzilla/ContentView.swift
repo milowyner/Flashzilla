@@ -9,17 +9,30 @@ import SwiftUI
 import CoreHaptics
 
 struct ContentView: View {
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
+    @Environment(\.accessibilityReduceTransparency) var reduceTransparency
+    @State private var scale: CGFloat = 1
+    
     var body: some View {
         Text("Hello, World!")
-            .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
-                print("Moving to the background!")
+            .padding()
+            .background(reduceTransparency ? Color.black : Color.black.opacity(0.5))
+            .foregroundColor(Color.white)
+            .clipShape(Capsule())
+            .scaleEffect(scale)
+            .onTapGesture {
+                withOptionalAnimation {
+                    scale *= 1.5
+                }
             }
-            .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
-                print("Moving back to the foreground!")
-            }
-            .onReceive(NotificationCenter.default.publisher(for: UIApplication.userDidTakeScreenshotNotification)) { _ in
-                print("User took a screenshot!")
-            }
+    }
+    
+    func withOptionalAnimation<Result>(_ animation: Animation? = .default, _ body: () throws -> Result) rethrows -> Result {
+        if UIAccessibility.isReduceMotionEnabled {
+            return try body()
+        } else {
+            return try withAnimation(animation, body)
+        }
     }
 }
 
