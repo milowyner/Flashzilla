@@ -9,18 +9,16 @@ import SwiftUI
 import CoreHaptics
 
 struct ContentView: View {
-    let timer = Timer.publish(every: 1, tolerance: 0.5, on: .main, in: .common).autoconnect()
-    @State private var counter = 0
-    
     var body: some View {
         Text("Hello, World!")
-            .onReceive(timer) { time in
-                if counter < 5 {
-                    print("The time is \(time)")
-                    counter += 1
-                } else {
-                    timer.upstream.connect().cancel()
-                }
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
+                print("Moving to the background!")
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+                print("Moving back to the foreground!")
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.userDidTakeScreenshotNotification)) { _ in
+                print("User took a screenshot!")
             }
     }
 }
