@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var cards = [Card](repeating: Card.example, count: 7)
+    @State private var cards = [Card](repeating: Card.example, count: 10)
     
     var body: some View {
         ZStack {
@@ -17,11 +17,17 @@ struct ContentView: View {
                 .scaledToFill()
                 .edgesIgnoringSafeArea(.all)
             
-            ForEach(0..<cards.count) { index in
-                CardView(card: cards[index])
-                    .stacked(at: index, in: cards.count)
+            ForEach(0..<cards.count, id: \.self) { index in
+                CardView(card: cards[index]) {
+                    removeCard(at: index)
+                }
+                .stacked(at: index, in: cards.count)
             }
         }
+    }
+    
+    func removeCard(at index: Int) {
+        cards.remove(at: index)
     }
 }
 
