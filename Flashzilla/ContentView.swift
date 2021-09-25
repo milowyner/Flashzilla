@@ -9,49 +9,19 @@ import SwiftUI
 import CoreHaptics
 
 struct ContentView: View {
-    @State private var engine: CHHapticEngine?
+    let timer = Timer.publish(every: 1, tolerance: 0.5, on: .main, in: .common).autoconnect()
+    @State private var counter = 0
     
     var body: some View {
-        Text("Success")
-            .onAppear(perform: prepareHaptics)
-            .onTapGesture {
-                complexSuccess()
+        Text("Hello, World!")
+            .onReceive(timer) { time in
+                if counter < 5 {
+                    print("The time is \(time)")
+                    counter += 1
+                } else {
+                    timer.upstream.connect().cancel()
+                }
             }
-    }
-    
-    func prepareHaptics() {
-        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
-        
-        do {
-            engine = try CHHapticEngine()
-            try engine?.start()
-        } catch {
-            print("There was an error creating the engine: \(error.localizedDescription)")
-        }
-    }
-    
-    func complexSuccess() {
-        // make sure that the device supports haptics
-        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
-        var events = [CHHapticEvent]()
-        
-        // create several taps of increasing then decreasing intensity and sharpness
-        for i in stride(from: 0, to: 1, by: 0.05) {
-            let value = Float(-abs(2 * i - 1) + 1)
-            let intensity = CHHapticEventParameter(parameterID: .hapticIntensity, value: value)
-            let sharpness = CHHapticEventParameter(parameterID: .hapticSharpness, value: value)
-            let event = CHHapticEvent(eventType: .hapticTransient, parameters: [intensity, sharpness], relativeTime: i * 2)
-            events.append(event)
-        }
-
-        // convert those events into a pattern and play it immediately
-        do {
-            let pattern = try CHHapticPattern(events: events, parameters: [])
-            let player = try engine?.makePlayer(with: pattern)
-            try player?.start(atTime: 0)
-        } catch {
-            print("Failed to play pattern: \(error.localizedDescription).")
-        }
     }
 }
 
