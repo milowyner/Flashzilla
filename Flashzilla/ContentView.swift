@@ -10,11 +10,13 @@ import SwiftUI
 struct ContentView: View {
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     @Environment(\.accessibilityEnabled) var accessibilityEnabled
-    @State private var cards = [Card](repeating: Card.example, count: 10)
+    @State private var cards = [Card]()
     
     @State private var isActive = true
     @State private var timeRemaining = 100
     let timer = Timer.TimerPublisher(interval: 1, runLoop: .main, mode: .common).autoconnect()
+    
+    @State private var showingEditScreen = false
     
     var body: some View {
         ZStack {
@@ -56,7 +58,27 @@ struct ContentView: View {
                 }
             }
             
-            if differentiateWithoutColor || accessibilityEnabled && !cards.isEmpty {
+            VStack {
+                HStack {
+                    Spacer()
+
+                    Button(action: {
+                        showingEditScreen = true
+                    }) {
+                        Image(systemName: "plus.circle")
+                            .padding()
+                            .background(Color.black.opacity(0.7))
+                            .clipShape(Circle())
+                    }
+                }
+
+                Spacer()
+            }
+            .foregroundColor(.white)
+            .font(.largeTitle)
+            .padding()
+            
+            if (differentiateWithoutColor || accessibilityEnabled) && !cards.isEmpty {
                 VStack {
                     Spacer()
 
@@ -90,6 +112,19 @@ struct ContentView: View {
                 }
             }
         }
+        .onAppear(perform: {
+            if let cards = ContentView.loadCards() {
+                self.cards = cards
+            } else {
+                isActive = false
+                showingEditScreen = true
+            }
+        })
+        .sheet(isPresented: $showingEditScreen, onDismiss: {
+            resetCards()
+        }) {
+            EditCards()
+        }
         .onReceive(timer) { time in
             guard isActive else { return }
             if timeRemaining > 0 {
@@ -115,9 +150,18 @@ struct ContentView: View {
     }
     
     func resetCards() {
-        cards = [Card](repeating: Card.example, count: 10)
+        cards = ContentView.loadCards() ?? []
         timeRemaining = 100
         isActive = true
+    }
+    
+    static func loadCards() -> [Card]? {
+        if let data = UserDefaults.standard.data(forKey: "SavedCards") {
+           return try? JSONDecoder().decode([Card].self, from: data)
+        } else {
+            print("Error loading")
+            return nil
+        }
     }
 }
 
