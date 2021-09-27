@@ -17,6 +17,7 @@ struct ContentView: View {
     let timer = Timer.TimerPublisher(interval: 1, runLoop: .main, mode: .common).autoconnect()
     
     @State private var showingEditScreen = false
+    @State private var showingAlert = false
     
     var body: some View {
         ZStack {
@@ -121,10 +122,18 @@ struct ContentView: View {
         .sheet(isPresented: $showingEditScreen, onDismiss: resetCards) {
             EditCards()
         }
+        .alert(isPresented: $showingAlert) {
+            Alert(title: Text("Time's up!"), dismissButton: .default(Text("Start Over"), action: {
+                resetCards()
+            }))
+        }
         .onReceive(timer) { time in
             guard isActive else { return }
             if timeRemaining > 0 {
                 timeRemaining -= 1
+            } else {
+                showingAlert = true
+                isActive = false
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
