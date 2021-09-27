@@ -9,7 +9,7 @@ import SwiftUI
 
 struct EditCards: View {
     @Environment(\.presentationMode) var presentationMode
-    @State private var cards = ContentView.loadCards() ?? []
+    @State private var cards = [Card]()
     @State private var showingAlert = false
     
     @State private var prompt = ""
@@ -17,9 +17,15 @@ struct EditCards: View {
     
     var body: some View {
         NavigationView {
-            VStack {
-                List {
-                    ForEach((0..<cards.count).reversed(), id: \.self) { index in
+            List {
+                Section {
+                    TextField("Prompt", text: $prompt)
+                    TextField("Answer", text: $answer)
+                    Button("Add card", action: addCard)
+                }
+                
+                Section {
+                    ForEach((0..<cards.count), id: \.self) { index in
                         VStack(alignment: .leading) {
                             Text(cards[index].prompt)
                                 .font(.headline)
@@ -27,42 +33,52 @@ struct EditCards: View {
                                 .foregroundColor(.secondary)
                         }
                     }
-                    .onDelete { indexSet in
-                        cards.remove(atOffsets: indexSet)
-                        save()
-                    }
+                    .onDelete(perform: removeCards)
                 }
-                
-                HStack {
-                    TextField("Prompt", text: $prompt)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                    TextField("Answer", text: $answer)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                    Button("Add") {
-                        let card = Card(prompt: prompt, answer: answer)
-                        withAnimation {
-                            cards.append(card)
-                        }
-                        prompt = ""
-                        answer = ""
-                        save()
-                        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-                    }
-                    .padding(.horizontal)
-                }
-                .padding(.horizontal)
-
             }
-            .navigationBarTitle(Text("Edit Cards"))
-            .navigationBarItems(trailing: Button("Done") {
-                presentationMode.wrappedValue.dismiss()
-            })
+            .navigationBarTitle("Edit Cards")
+            .navigationBarItems(trailing: Button("Done", action: dismiss))
+//            .listStyle(GroupedListStyle())
+            .onAppear(perform: loadData)
         }
+    }
+    
+    func dismiss() {
+        presentationMode.wrappedValue.dismiss()
     }
     
     func save() {
         guard let data = try? JSONEncoder().encode(cards) else { print("Error saving"); return }
         UserDefaults.standard.set(data, forKey: "SavedCards")
+    }
+    
+    func loadData() {
+        if let data = UserDefaults.standard.data(forKey: "SavedCards"),
+           let decoded = try? JSONDecoder().decode([Card].self, from: data) {
+            cards = decoded
+        } else {
+            print("Error loading")
+        }
+    }
+    
+    func addCard() {
+        let trimmedPrompt = prompt.trimmingCharacters(in: .whitespaces)
+        let trimmedAnswer = answer.trimmingCharacters(in: .whitespaces)
+        guard !trimmedPrompt.isEmpty && !trimmedAnswer.isEmpty else { return }
+        
+        let card = Card(prompt: trimmedPrompt, answer: trimmedAnswer)
+        withAnimation {
+            cards.insert(card, at: 0)
+        }
+        prompt = ""
+        answer = ""
+        save()
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
+    
+    func removeCards(atOffsets offsets: IndexSet) {
+           cards.remove(atOffsets: offsets)
+           save()
     }
 }
 

@@ -113,16 +113,12 @@ struct ContentView: View {
             }
         }
         .onAppear(perform: {
-            if let cards = ContentView.loadCards() {
-                self.cards = cards
-            } else {
+            if loadData() == false {
                 isActive = false
                 showingEditScreen = true
             }
         })
-        .sheet(isPresented: $showingEditScreen, onDismiss: {
-            resetCards()
-        }) {
+        .sheet(isPresented: $showingEditScreen, onDismiss: resetCards) {
             EditCards()
         }
         .onReceive(timer) { time in
@@ -150,17 +146,19 @@ struct ContentView: View {
     }
     
     func resetCards() {
-        cards = ContentView.loadCards() ?? []
+        loadData()
         timeRemaining = 100
         isActive = true
     }
     
-    static func loadCards() -> [Card]? {
-        if let data = UserDefaults.standard.data(forKey: "SavedCards") {
-           return try? JSONDecoder().decode([Card].self, from: data)
+    @discardableResult func loadData() -> Bool {
+        if let data = UserDefaults.standard.data(forKey: "SavedCards"),
+           let decoded = try? JSONDecoder().decode([Card].self, from: data) {
+            cards = decoded
+            return true
         } else {
             print("Error loading")
-            return nil
+            return false
         }
     }
 }
