@@ -46,7 +46,7 @@ struct ContentView: View {
                         CardView(card: cards[index]) { answer in
                             removeCard(at: index, correct: answer)
                         }
-//                        .allowsHitTesting(index == cards.count - 1)
+                        .allowsHitTesting(index == cards.count - 1)
                         .accessibility(hidden: index < cards.count - 1)
                         .stacked(at: index, in: cards.count)
                     }
@@ -97,7 +97,7 @@ struct ContentView: View {
 
                     HStack {
                         Button(action: {
-                            removeCard(at: cards.count - 1)
+                            removeCard(at: cards.count - 1, correct: false)
                         }) {
                             Image(systemName: "xmark.circle")
                                 .padding()
@@ -109,7 +109,7 @@ struct ContentView: View {
                         Spacer()
                         
                         Button(action: {
-                            removeCard(at: cards.count - 1)
+                            removeCard(at: cards.count - 1, correct: true)
                         }) {
                             Image(systemName: "checkmark.circle")
                                 .padding()
@@ -162,7 +162,7 @@ struct ContentView: View {
         }
     }
     
-    func removeCard(at index: Int, correct: Bool = false) {
+    func removeCard(at index: Int, correct: Bool) {
         guard index >= 0 else { return }
         let card = cards.remove(at: index)
         

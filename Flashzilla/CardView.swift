@@ -59,7 +59,6 @@ struct CardView: View {
         .rotationEffect(.degrees(offset.width / 5.0))
         .offset(x: offset.width * 5, y: 0)
         .opacity(2.0 - abs(offset.width / 50.0))
-        .animation(.spring())
         .accessibility(addTraits: .isButton)
         .gesture(
             DragGesture()
@@ -68,17 +67,19 @@ struct CardView: View {
                     feedback.prepare()
                 }
                 .onEnded { _ in
-                    withAnimation {
-                        if abs(offset.width) > 100 {
-                            if offset.width > 0 {
-                                feedback.notificationOccurred(.success)
+                    if abs(offset.width) > 100 {
+                        if offset.width > 0 {
+                            feedback.notificationOccurred(.success)
+                            withAnimation {
                                 removal?(true)
-                            } else {
-                                feedback.notificationOccurred(.error)
-                                offset = CGSize.zero
-                                removal?(false)
                             }
                         } else {
+                            feedback.notificationOccurred(.error)
+                            offset = CGSize.zero
+                            removal?(false)
+                        }
+                    } else {
+                        withAnimation {
                             offset = .zero
                         }
                     }
