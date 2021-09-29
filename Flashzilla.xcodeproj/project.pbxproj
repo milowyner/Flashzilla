@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		05252B51270245BD00B7267B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05252B50270245BD00B7267B /* SettingsView.swift */; };
 		05B56E87270014A2001E4A59 /* EditCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05B56E86270014A2001E4A59 /* EditCards.swift */; };
 		05F0E5F526FBC07700277476 /* FlashzillaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F0E5F426FBC07700277476 /* FlashzillaApp.swift */; };
 		05F0E5F726FBC07700277476 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F0E5F626FBC07700277476 /* ContentView.swift */; };
@@ -17,6 +18,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		05252B50270245BD00B7267B /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		05B56E86270014A2001E4A59 /* EditCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditCards.swift; sourceTree = "<group>"; };
 		05F0E5F126FBC07700277476 /* Flashzilla.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Flashzilla.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		05F0E5F426FBC07700277476 /* FlashzillaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlashzillaApp.swift; sourceTree = "<group>"; };
@@ -62,6 +64,7 @@
 				05F78BEF26FEB8B500EA843E /* Card.swift */,
 				05F78BF126FEB9F000EA843E /* CardView.swift */,
 				05B56E86270014A2001E4A59 /* EditCards.swift */,
+				05252B50270245BD00B7267B /* SettingsView.swift */,
 				05F0E5F826FBC07900277476 /* Assets.xcassets */,
 				05F0E5FA26FBC07900277476 /* Preview Content */,
 			);
@@ -149,6 +152,7 @@
 				05F0E5F726FBC07700277476 /* ContentView.swift in Sources */,
 				05F78BF026FEB8B500EA843E /* Card.swift in Sources */,
 				05F78BF226FEB9F000EA843E /* CardView.swift in Sources */,
+				05252B51270245BD00B7267B /* SettingsView.swift in Sources */,
 				05B56E87270014A2001E4A59 /* EditCards.swift in Sources */,
 				05F0E5F526FBC07700277476 /* FlashzillaApp.swift in Sources */,
 			);

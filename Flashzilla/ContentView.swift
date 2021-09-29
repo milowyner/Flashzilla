@@ -17,7 +17,10 @@ struct ContentView: View {
     let timer = Timer.TimerPublisher(interval: 1, runLoop: .main, mode: .common).autoconnect()
     
     @State private var showingEditScreen = false
+    @State private var showingSettingsScreen = false
     @State private var showingAlert = false
+    
+    @State private var wrongAnswerBackToArray = false
     
     var body: some View {
         ZStack {
@@ -40,10 +43,10 @@ struct ContentView: View {
                 
                 ZStack {
                     ForEach(0..<cards.count, id: \.self) { index in
-                        CardView(card: cards[index]) {
-                            removeCard(at: index)
+                        CardView(card: cards[index]) { answer in
+                            removeCard(at: index, correct: answer)
                         }
-                        .allowsHitTesting(index == cards.count - 1)
+//                        .allowsHitTesting(index == cards.count - 1)
                         .accessibility(hidden: index < cards.count - 1)
                         .stacked(at: index, in: cards.count)
                     }
@@ -61,6 +64,15 @@ struct ContentView: View {
             
             VStack {
                 HStack {
+                    Button(action: {
+                        showingSettingsScreen = true
+                    }) {
+                        Image(systemName: "gearshape")
+                            .padding()
+                            .background(Color.black.opacity(0.7))
+                            .clipShape(Circle())
+                    }
+                    
                     Spacer()
 
                     Button(action: {
@@ -114,6 +126,7 @@ struct ContentView: View {
             }
         }
         .onAppear(perform: {
+            wrongAnswerBackToArray = UserDefaults.standard.bool(forKey: "wrongAnswerBackToArray")
             if loadData() == false {
                 isActive = false
                 showingEditScreen = true
@@ -121,6 +134,9 @@ struct ContentView: View {
         })
         .sheet(isPresented: $showingEditScreen, onDismiss: resetCards) {
             EditCards()
+        }
+        .sheet(isPresented: $showingSettingsScreen) {
+            SettingsView(wrongAnswerBackToArray: $wrongAnswerBackToArray)
         }
         .alert(isPresented: $showingAlert) {
             Alert(title: Text("Time's up!"), dismissButton: .default(Text("Start Over"), action: {
@@ -146,9 +162,13 @@ struct ContentView: View {
         }
     }
     
-    func removeCard(at index: Int) {
+    func removeCard(at index: Int, correct: Bool = false) {
         guard index >= 0 else { return }
-        cards.remove(at: index)
+        let card = cards.remove(at: index)
+        
+        if !correct && wrongAnswerBackToArray {
+            cards.insert(card, at: 0)
+        }
         if cards.isEmpty {
             isActive = false
         }
