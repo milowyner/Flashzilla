@@ -19,6 +19,16 @@ struct CardView: View {
     
     let feedback = UINotificationFeedbackGenerator()
     
+    var backgroundColor: Color {
+        if offset.width > 0 {
+            return Color.green
+        } else if offset.width < 0 {
+            return Color.red
+        } else {
+            return Color.white
+        }
+    }
+    
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 25, style: .continuous)
@@ -32,7 +42,7 @@ struct CardView: View {
                     differentiateWithoutColor
                     ? nil
                     : RoundedRectangle(cornerRadius: 25, style: .continuous)
-                        .fill(offset.width > 0 ? Color.green : Color.red)
+                        .fill(backgroundColor)
                 )
             
             VStack {
